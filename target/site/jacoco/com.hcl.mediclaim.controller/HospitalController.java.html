@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>HospitalController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MediClaimSystem</a> &gt; <a href="index.source.html" class="el_package">com.hcl.mediclaim.controller</a> &gt; <span class="el_source">HospitalController.java</span></div><h1>HospitalController.java</h1><pre class="source lang-java linenums">package com.hcl.mediclaim.controller;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.hcl.mediclaim.dto.DiseaseDto;
+import com.hcl.mediclaim.dto.HospitalDto;
+import com.hcl.mediclaim.service.HospitalService;
+
+import lombok.extern.slf4j.Slf4j;
+
+/**
+ * Common controller for Hospital
+ * 
+ * @author Laxman
+ * @date 21-OCT-2019
+ * 
+ */
+<span class="fc" id="L26">@Slf4j</span>
+@RequestMapping(&quot;/&quot;)
+@RestController
+@CrossOrigin(allowedHeaders = { &quot;*&quot;, &quot;*/&quot; }, origins = { &quot;*&quot;, &quot;*/&quot; })
+<span class="fc" id="L30">public class HospitalController {</span>
+
+	@Autowired
+	private HospitalService hospitalService;
+
+	
+	/**
+	 * Method will return the list of hospitals, user is allowed to claim for listed
+	 * hospitals
+	 * 
+	 * @return List&lt;HospitalDto&gt;
+	 * 
+	 */
+	@GetMapping(&quot;/hospitals&quot;)
+	public ResponseEntity&lt;List&lt;HospitalDto&gt;&gt; getHospitals() {
+		
+<span class="fc" id="L46">		log.info(&quot; :: getHospitals ----&quot;);</span>
+<span class="fc" id="L47">		return new ResponseEntity&lt;&gt;(hospitalService.getHospitals(), HttpStatus.OK);</span>
+	}
+
+	
+	/**
+	 * Method will return the list of disease which are allowed to claim.
+	 * 
+	 * @return List&lt;DiseaseDto&gt;
+	 */
+	@GetMapping(&quot;/hospitals/disease&quot;)
+	public ResponseEntity&lt;List&lt;DiseaseDto&gt;&gt; getDisease() {
+		
+<span class="fc" id="L59">		log.info(&quot; :: getDisease ----&quot;);</span>
+<span class="fc" id="L60">		return new ResponseEntity&lt;&gt;(hospitalService.getDisease(), HttpStatus.OK);</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.0.201801022044</span></div></body></html>

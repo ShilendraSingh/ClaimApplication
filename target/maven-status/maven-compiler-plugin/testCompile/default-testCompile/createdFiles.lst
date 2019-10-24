@@ -1,0 +1,6 @@
+com\hcl\mediclaim\service\HospoitalServiceTest.class
+com\hcl\mediclaim\service\MedicalClainServiceTest.class
+com\hcl\mediclaim\controller\LoginControllerTest.class
+com\hcl\mediclaim\controller\TestMedicalClaimController.class
+com\hcl\mediclaim\controller\HospitalControllerTest.class
+com\hcl\mediclaim\service\LoginServiceImplTest.class

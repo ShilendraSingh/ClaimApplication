@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MedicalClaimController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MediClaimSystem</a> &gt; <a href="index.source.html" class="el_package">com.hcl.mediclaim.controller</a> &gt; <span class="el_source">MedicalClaimController.java</span></div><h1>MedicalClaimController.java</h1><pre class="source lang-java linenums">package com.hcl.mediclaim.controller;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.hcl.mediclaim.dto.ApproveClaimRequestDto;
+import com.hcl.mediclaim.dto.ApproveClaimResponseDto;
+import com.hcl.mediclaim.dto.ClaimDetailsDto;
+import com.hcl.mediclaim.dto.ClaimDto;
+import com.hcl.mediclaim.dto.MedicalClaimRequestDto;
+import com.hcl.mediclaim.dto.MedicalClaimResponseDto;
+import com.hcl.mediclaim.exception.InvalidClaimIdException;
+import com.hcl.mediclaim.exception.InvalidPolicyIdException;
+import com.hcl.mediclaim.exception.InvalidUserException;
+import com.hcl.mediclaim.exception.RemarksEmptyException;
+import com.hcl.mediclaim.service.ClaimRequestService;
+import com.hcl.mediclaim.service.MedicalClaimService;
+
+import lombok.extern.slf4j.Slf4j;
+
+/**
+ * Controller to perform claim
+ * 
+ * @author Laxman /Sushil
+ * @date 21-OCT-2019
+ *
+ */
+
+<span class="fc" id="L40">@Slf4j</span>
+@RequestMapping(&quot;/&quot;)
+@RestController
+@CrossOrigin(allowedHeaders = { &quot;*&quot;, &quot;*/&quot; }, origins = { &quot;*&quot;, &quot;*/&quot; })
+<span class="fc" id="L44">public class MedicalClaimController {</span>
+
+	@Autowired
+	private ClaimRequestService claimRequestService;
+
+	@Autowired
+	private MedicalClaimService medicalClaimService;
+
+	/**
+	 * This method is use to apply medical claim for user
+	 * 
+	 * @param medicalClaimRequestDto ,not null
+	 * @return MedicalClaimResponseDto , not null
+	 * @throws InvalidUserException     if user does not exist
+	 * @throws InvalidPolicyIdException if policy id does not exist
+	 */
+	@PostMapping(&quot;/claims/users&quot;)
+	public ResponseEntity&lt;MedicalClaimResponseDto&gt; applyMedicalClaim(
+			@RequestBody MedicalClaimRequestDto medicalClaimRequestDto)
+			throws InvalidUserException, InvalidPolicyIdException {
+<span class="fc" id="L64">		log.info(&quot;Inside applyMedicalClaim of MedicalClaimController&quot;);</span>
+<span class="fc" id="L65">		MedicalClaimResponseDto response = claimRequestService.applyMedicalClaim(medicalClaimRequestDto);</span>
+
+<span class="fc" id="L67">		return new ResponseEntity&lt;&gt;(response, HttpStatus.CREATED);</span>
+	}
+
+	/**
+	 * Method will return the list of claim based on login, if APPROVER has login
+	 * then record will show for approver level when SUPPER APPROVER will login
+	 * record will show for SUPPER APPROVER
+	 * 
+	 * @param userId
+	 * @return List&lt;ClaimDto&gt;
+	 */
+	@GetMapping(&quot;/claims/users/{userId}&quot;)
+	public ResponseEntity&lt;List&lt;ClaimDto&gt;&gt; getClaims(@PathVariable Integer userId) {
+
+<span class="fc" id="L81">		log.info(&quot; :: getPolicies ---- userId : {}&quot;, userId);</span>
+<span class="fc" id="L82">		return new ResponseEntity&lt;&gt;(medicalClaimService.getClaims(userId), HttpStatus.OK);</span>
+	}
+
+	/**
+	 * Method show the details of particular claim based on claim id.
+	 * 
+	 * @param claimId
+	 * @return ClaimDetailsDto
+	 */
+	@GetMapping(&quot;/claims/{claimId}&quot;)
+	public ResponseEntity&lt;ClaimDetailsDto&gt; getClaimDetails(@PathVariable Integer claimId) {
+
+<span class="fc" id="L94">		log.info(&quot; :: getClaimDetails ---- claimId : &quot;, claimId);</span>
+<span class="fc" id="L95">		return new ResponseEntity&lt;&gt;(medicalClaimService.getClainDetails(claimId), HttpStatus.OK);</span>
+	}
+
+	@PutMapping(&quot;/claims/{claimId}&quot;)
+	public ResponseEntity&lt;ApproveClaimResponseDto&gt; approveClaim(@PathVariable Integer claimId,
+			@RequestBody ApproveClaimRequestDto approveClaimRequestDto)
+			throws InvalidClaimIdException, InvalidUserException, RemarksEmptyException {
+<span class="fc" id="L102">		return new ResponseEntity&lt;&gt;(claimRequestService.approveMedicalClaim(claimId, approveClaimRequestDto),</span>
+				HttpStatus.OK);
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.0.201801022044</span></div></body></html>

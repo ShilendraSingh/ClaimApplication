@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ClaimRequest.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MediClaimSystem</a> &gt; <a href="index.source.html" class="el_package">com.hcl.mediclaim.entity</a> &gt; <span class="el_source">ClaimRequest.java</span></div><h1>ClaimRequest.java</h1><pre class="source lang-java linenums">package com.hcl.mediclaim.entity;
+
+import java.time.LocalDate;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+<span class="pc" id="L16">@Setter</span>
+@Entity
+<span class="fc" id="L18">@NoArgsConstructor</span>
+<span class="nc" id="L19">@AllArgsConstructor</span>
+public class ClaimRequest {
+
+	@Id
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
+<span class="fc" id="L24">	private Integer claimId;</span>
+<span class="fc" id="L25">	private Integer userId;</span>
+<span class="fc" id="L26">	private Integer policyId;</span>
+<span class="fc" id="L27">	private String hospitalName;</span>
+<span class="fc" id="L28">	private String diagnosis;</span>
+<span class="fc" id="L29">	private LocalDate admissionDate;</span>
+<span class="fc" id="L30">	private LocalDate dischargeDate;</span>
+<span class="fc" id="L31">	private Double claimAmount;</span>
+<span class="nc" id="L32">	private Double approvedAmount;</span>
+<span class="fc" id="L33">	private String status;</span>
+<span class="fc" id="L34">	private LocalDate claimDate;</span>
+<span class="fc" id="L35">	private Integer approverId;</span>
+<span class="nc" id="L36">	private LocalDate approvalDate;</span>
+<span class="nc" id="L37">	private String remarks;</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.0.201801022044</span></div></body></html>

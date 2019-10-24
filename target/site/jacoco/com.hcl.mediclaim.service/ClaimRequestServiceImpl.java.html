@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ClaimRequestServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MediClaimSystem</a> &gt; <a href="index.source.html" class="el_package">com.hcl.mediclaim.service</a> &gt; <span class="el_source">ClaimRequestServiceImpl.java</span></div><h1>ClaimRequestServiceImpl.java</h1><pre class="source lang-java linenums">package com.hcl.mediclaim.service;
+
+import java.time.LocalDate;
+import java.util.Optional;
+
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.hcl.mediclaim.dto.ApproveClaimRequestDto;
+import com.hcl.mediclaim.dto.ApproveClaimResponseDto;
+import com.hcl.mediclaim.dto.MedicalClaimRequestDto;
+import com.hcl.mediclaim.dto.MedicalClaimResponseDto;
+import com.hcl.mediclaim.entity.ClaimRequest;
+import com.hcl.mediclaim.entity.Policy;
+import com.hcl.mediclaim.entity.Role;
+import com.hcl.mediclaim.entity.User;
+import com.hcl.mediclaim.entity.UserPolicy;
+import com.hcl.mediclaim.exception.InvalidClaimIdException;
+import com.hcl.mediclaim.exception.InvalidPolicyIdException;
+import com.hcl.mediclaim.exception.InvalidUserException;
+import com.hcl.mediclaim.exception.RemarksEmptyException;
+import com.hcl.mediclaim.repository.ClaimRequestRepository;
+import com.hcl.mediclaim.repository.PolicyRepository;
+import com.hcl.mediclaim.repository.RoleRepository;
+import com.hcl.mediclaim.repository.UserPolicyRepository;
+import com.hcl.mediclaim.repository.UserRepository;
+import com.hcl.mediclaim.utility.MediClaimUtility;
+import com.hcl.mediclaim.utility.RoleType;
+import com.hcl.mediclaim.utility.StatusType;
+
+import lombok.extern.slf4j.Slf4j;
+
+/**
+ * 
+ * @author Sushil This service class is use to apply for medical claim
+ *
+ */
+@Service
+<span class="fc" id="L40">@Slf4j</span>
+<span class="nc" id="L41">public class ClaimRequestServiceImpl implements ClaimRequestService {</span>
+
+	@Autowired
+	UserPolicyRepository userPolicyRepository;
+
+	@Autowired
+	PolicyRepository policyRepository;
+
+	@Autowired
+	UserRepository userRepository;
+
+	@Autowired
+	private RoleRepository roleRepository;
+
+	@Autowired
+	ClaimRequestRepository claimRequestRepository;
+
+	/**
+	 * This method is use to apply for medical claim
+	 * 
+	 * @param MedicalClaimRequestDto, not null
+	 * @param MedicalClaimResponseDto ,not null
+	 * @throws InvalidUserException     if user does not exist
+	 * @throws InvalidPolicyIdException if policy id does not exist
+	 */
+	@Override
+	public MedicalClaimResponseDto applyMedicalClaim(MedicalClaimRequestDto medicalClaimRequestDto)
+			throws InvalidUserException, InvalidPolicyIdException {
+<span class="nc" id="L69">		log.info(&quot;Inside applyMedicalClaim of ClaimRequestServiceImpl&quot;);</span>
+		MedicalClaimResponseDto responseDto;
+		/* get user object */
+
+<span class="nc" id="L73">		Optional&lt;User&gt; user = userRepository.findById(medicalClaimRequestDto.getUserId());</span>
+<span class="nc bnc" id="L74" title="All 2 branches missed.">		if (user.isPresent()) {</span>
+<span class="nc bnc" id="L75" title="All 2 branches missed.">			if (user.get().getUserId() == medicalClaimRequestDto.getUserId()</span>
+<span class="nc bnc" id="L76" title="All 2 branches missed.">					&amp;&amp; user.get().getAadhaarNumber() == medicalClaimRequestDto.getAadhaarNumber()) {</span>
+<span class="nc" id="L77">				Optional&lt;Policy&gt; policy = policyRepository.findById(medicalClaimRequestDto.getPolicyId());</span>
+<span class="nc bnc" id="L78" title="All 2 branches missed.">				if (policy.isPresent()) {</span>
+<span class="nc" id="L79">					ClaimRequest claimRequest = new ClaimRequest();</span>
+
+<span class="nc" id="L81">					BeanUtils.copyProperties(medicalClaimRequestDto, claimRequest);</span>
+<span class="nc" id="L82">					claimRequest.setClaimDate(LocalDate.now());</span>
+<span class="nc" id="L83">					claimRequest.setStatus(MediClaimUtility.CLAIM_PENDING_STATUS);</span>
+					/* save claim object */
+<span class="nc" id="L85">					ClaimRequest claimRequestResponse = claimRequestRepository.save(claimRequest);</span>
+					/* prepare response */
+<span class="nc" id="L87">					responseDto = new MedicalClaimResponseDto();</span>
+<span class="nc" id="L88">					responseDto.setClaimId(claimRequestResponse.getClaimId());</span>
+<span class="nc" id="L89">					responseDto.setStatus(MediClaimUtility.SUCCESS_RESPONSE);</span>
+<span class="nc" id="L90">					responseDto.setMessage(MediClaimUtility.CLAIM_SUCCESS_REMARK);</span>
+
+<span class="nc" id="L92">				} else {</span>
+<span class="nc" id="L93">					throw new InvalidPolicyIdException(MediClaimUtility.INVALID_POLICYID_EXCEPTION);</span>
+				}
+<span class="nc" id="L95">			} else {</span>
+<span class="nc" id="L96">				throw new InvalidUserException(MediClaimUtility.INVALID_USER_EXCEPTION_AADHAR_OR_USERID);</span>
+			}
+		} else {
+<span class="nc" id="L99">			throw new InvalidUserException(MediClaimUtility.INVALID_USER_EXCEPTION);</span>
+		}
+<span class="nc" id="L101">		return responseDto;</span>
+	}
+
+	/**
+	 * This method is use to approve medical claim
+	 * 
+	 * @param claimId,not null
+	 * @param
+	 * @throws RemarksEmptyException
+	 */
+	@Override
+	public ApproveClaimResponseDto approveMedicalClaim(int claimId, ApproveClaimRequestDto claimRequestDto)
+			throws InvalidClaimIdException, InvalidUserException, RemarksEmptyException {
+<span class="nc" id="L114">		log.info(&quot;Inside approveMedicalClaim of ClaimRequestServiceImpl&quot;);</span>
+
+<span class="nc" id="L116">		ApproveClaimResponseDto approveClaimResponseDto = new ApproveClaimResponseDto();</span>
+<span class="nc" id="L117">		Optional&lt;User&gt; user = userRepository.findById(claimRequestDto.getUserId());</span>
+<span class="nc bnc" id="L118" title="All 2 branches missed.">		if (!user.isPresent()) {</span>
+<span class="nc" id="L119">			throw new InvalidUserException(MediClaimUtility.INVALID_USER_EXCEPTION);</span>
+		}
+<span class="nc" id="L121">		Optional&lt;ClaimRequest&gt; optionalClaimRequest = claimRequestRepository.findById(claimId);</span>
+<span class="nc bnc" id="L122" title="All 2 branches missed.">		if (!optionalClaimRequest.isPresent()) {</span>
+<span class="nc" id="L123">			throw new InvalidClaimIdException(MediClaimUtility.INVALID_CLAIM_ID_EXCEPTION);</span>
+		}
+<span class="nc bnc" id="L125" title="All 2 branches missed.">		if ((claimRequestDto.getStatus().equals(StatusType.REJECTED.name())</span>
+<span class="nc bnc" id="L126" title="All 2 branches missed.">				|| claimRequestDto.getStatus().equals(StatusType.SUPERPENDING.name()))</span>
+<span class="nc bnc" id="L127" title="All 4 branches missed.">				&amp;&amp; (claimRequestDto.getRemarks() == null || claimRequestDto.getRemarks().isEmpty())) {</span>
+<span class="nc" id="L128">			throw new RemarksEmptyException(MediClaimUtility.ENTER_REMARKS);</span>
+		}
+<span class="nc" id="L130">		ClaimRequest claimRequest = optionalClaimRequest.get();</span>
+<span class="nc" id="L131">		claimRequest.setApproverId(user.get().getUserId());</span>
+<span class="nc" id="L132">		claimRequest.setApprovalDate(LocalDate.now());</span>
+<span class="nc" id="L133">		claimRequest.setRemarks(claimRequestDto.getRemarks());</span>
+<span class="nc bnc" id="L134" title="All 2 branches missed.">		if (!(claimRequestDto.getStatus().equals(StatusType.REJECTED.name())</span>
+<span class="nc bnc" id="L135" title="All 2 branches missed.">				|| claimRequestDto.getStatus().equals(StatusType.SUPERPENDING.name()))) {</span>
+<span class="nc" id="L136">			Optional&lt;UserPolicy&gt; optionalUserPolicy = userPolicyRepository</span>
+<span class="nc" id="L137">					.findByUserIdAndPolicyId(claimRequest.getUserId(), claimRequest.getPolicyId());</span>
+<span class="nc bnc" id="L138" title="All 2 branches missed.">			if (optionalUserPolicy.isPresent()</span>
+<span class="nc bnc" id="L139" title="All 2 branches missed.">					&amp;&amp; (optionalUserPolicy.get().getBalanceAmount() &gt;= claimRequest.getClaimAmount())) {</span>
+<span class="nc" id="L140">				optionalUserPolicy.get()</span>
+<span class="nc" id="L141">						.setBalanceAmount(optionalUserPolicy.get().getBalanceAmount() - claimRequest.getClaimAmount());</span>
+<span class="nc" id="L142">				claimRequest.setApprovedAmount(claimRequest.getClaimAmount());</span>
+<span class="nc" id="L143">				userPolicyRepository.save(optionalUserPolicy.get());</span>
+<span class="nc" id="L144">				claimRequest.setStatus(claimRequestDto.getStatus());</span>
+			}
+<span class="nc" id="L146">			Optional&lt;Role&gt; optRole = roleRepository.findById(user.get().getRoleId());</span>
+<span class="nc bnc" id="L147" title="All 4 branches missed.">			if (optRole.isPresent() &amp;&amp; optionalUserPolicy.isPresent()</span>
+<span class="nc bnc" id="L148" title="All 2 branches missed.">					&amp;&amp; optRole.get().getRoleName().equals(RoleType.SUPER_ADMIN.name())) {</span>
+<span class="nc" id="L149">				claimRequest.setApprovedAmount(optionalUserPolicy.get().getBalanceAmount());</span>
+<span class="nc" id="L150">				optionalUserPolicy.get().setBalanceAmount(0);</span>
+<span class="nc" id="L151">				userPolicyRepository.save(optionalUserPolicy.get());</span>
+<span class="nc" id="L152">				claimRequest.setStatus(claimRequestDto.getStatus());</span>
+			}
+		}
+<span class="nc bnc" id="L155" title="All 2 branches missed.">		if (claimRequestDto.getStatus().equals(StatusType.REJECTED.name())</span>
+<span class="nc bnc" id="L156" title="All 2 branches missed.">				|| claimRequestDto.getStatus().equals(StatusType.SUPERPENDING.name())) {</span>
+<span class="nc" id="L157">			claimRequest.setStatus(claimRequestDto.getStatus());</span>
+		}
+<span class="nc" id="L159">		claimRequestRepository.save(claimRequest);</span>
+<span class="nc" id="L160">		approveClaimResponseDto.setMessage(MediClaimUtility.CLAIM_RESPONSE_MESSAGE + claimRequestDto.getStatus());</span>
+<span class="nc" id="L161">		approveClaimResponseDto.setStatus(MediClaimUtility.SUCCESS_RESPONSE);</span>
+
+<span class="nc" id="L163">		return approveClaimResponseDto;</span>
+	}
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.0.201801022044</span></div></body></html>
